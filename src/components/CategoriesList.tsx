@@ -15,6 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { CategoryForm } from "./CategoryForm"
 import { useCategories, type Category } from "@/hooks/useCategories"
 import { useAuth } from "@/contexts/AuthContext"
@@ -25,11 +35,20 @@ export function CategoriesList() {
   const { user } = useAuth()
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this category?")) {
-      await deleteCategory(id)
+  const handleDeleteClick = (id: string) => {
+    setCategoryToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (categoryToDelete) {
+      await deleteCategory(categoryToDelete)
       refresh()
+      setDeleteDialogOpen(false)
+      setCategoryToDelete(null)
     }
   }
 
@@ -112,7 +131,7 @@ export function CategoriesList() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDelete(category.id)}
+                              onClick={() => handleDeleteClick(category.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -134,6 +153,22 @@ export function CategoriesList() {
           )}
         </CardContent>
       </Card>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this category? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

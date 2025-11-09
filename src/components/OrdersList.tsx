@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,6 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { useOrders, type Order } from "@/hooks/useOrders"
 import { Trash2 } from "lucide-react"
@@ -28,11 +39,20 @@ const statusColors: Record<string, string> = {
 
 export function OrdersList() {
   const { orders, loading, hasMore, loadMore, deleteOrder, refresh } = useOrders()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null)
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this order?")) {
-      await deleteOrder(id)
+  const handleDeleteClick = (id: string) => {
+    setOrderToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (orderToDelete) {
+      await deleteOrder(orderToDelete)
       refresh()
+      setDeleteDialogOpen(false)
+      setOrderToDelete(null)
     }
   }
 
@@ -89,7 +109,7 @@ export function OrdersList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(order.id)}
+                          onClick={() => handleDeleteClick(order.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -109,6 +129,22 @@ export function OrdersList() {
           )}
         </CardContent>
       </Card>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this order? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
