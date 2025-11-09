@@ -1,16 +1,15 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { createClient } from "supabase";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
-}
+};
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders })
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
@@ -22,19 +21,19 @@ serve(async (req) => {
         global: {
           headers: { Authorization: req.headers.get("Authorization")! },
         },
-      }
-    )
+      },
+    );
 
-    const { method } = req
-    const url = new URL(req.url)
-    const action = url.searchParams.get("action") || "send"
+    const { method } = req;
+    const url = new URL(req.url);
+    const action = url.searchParams.get("action") || "send";
 
     if (method === "POST") {
-      const body = await req.json()
+      const body = await req.json();
 
       if (action === "send") {
         // Send notification
-        const { type, message, user_id } = body
+        const { type, message, user_id } = body;
 
         if (!type || !message) {
           return new Response(
@@ -42,8 +41,8 @@ serve(async (req) => {
             {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
               status: 400,
-            }
-          )
+            },
+          );
         }
 
         // In a real application, you would send this to a notification service
@@ -55,7 +54,7 @@ serve(async (req) => {
           user_id: user_id || null,
           created_at: new Date().toISOString(),
           read: false,
-        }
+        };
 
         return new Response(
           JSON.stringify({
@@ -66,13 +65,13 @@ serve(async (req) => {
           {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
-          }
-        )
+          },
+        );
       }
 
       if (action === "order_created") {
         // Send order creation notification
-        const { order_id, total_amount } = body
+        const { order_id, total_amount } = body;
 
         if (!order_id) {
           return new Response(
@@ -80,8 +79,8 @@ serve(async (req) => {
             {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
               status: 400,
-            }
-          )
+            },
+          );
         }
 
         // Get order details
@@ -89,26 +88,25 @@ serve(async (req) => {
           .from("orders")
           .select("user_id, total_amount, status")
           .eq("id", order_id)
-          .single()
+          .single();
 
         if (orderError || !order) {
-          return new Response(
-            JSON.stringify({ error: "Order not found" }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 404,
-            }
-          )
+          return new Response(JSON.stringify({ error: "Order not found" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 404,
+          });
         }
 
         const notification = {
           id: crypto.randomUUID(),
           type: "order_created",
-          message: `Your order #${order_id.slice(0, 8)} for $${total_amount || order.total_amount} has been created successfully!`,
+          message: `Your order #${order_id.slice(0, 8)} for $${
+            total_amount || order.total_amount
+          } has been created successfully!`,
           user_id: order.user_id,
           order_id,
           created_at: new Date().toISOString(),
-        }
+        };
 
         return new Response(
           JSON.stringify({
@@ -119,23 +117,22 @@ serve(async (req) => {
           {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
-          }
-        )
+          },
+        );
       }
     }
 
     if (method === "GET") {
       // Get notifications for the current user
-      const { data: { user } } = await supabaseClient.auth.getUser()
+      const {
+        data: { user },
+      } = await supabaseClient.auth.getUser();
 
       if (!user) {
-        return new Response(
-          JSON.stringify({ error: "Unauthorized" }),
-          {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 401,
-          }
-        )
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 401,
+        });
       }
 
       // In a real app, you would fetch from a notifications table
@@ -148,25 +145,18 @@ serve(async (req) => {
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
-        }
-      )
+        },
+      );
     }
 
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 405,
-      }
-    )
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 405,
+    });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    )
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
-})
-
+});
