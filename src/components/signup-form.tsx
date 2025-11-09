@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate, Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,32 +18,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
 import { toast } from "sonner"
+import { signupSchema, type SignupFormData } from "@/lib/validations"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
   const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match")
-      return
-    }
-
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long")
-      return
-    }
-
-    setLoading(true)
-
+  const onSubmit = async (data: SignupFormData) => {
     try {
-      const { error } = await signUp(email, password)
+      const { error } = await signUp(data.email, data.password)
       if (error) {
         toast.error(error.message)
       } else {
@@ -51,8 +42,6 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
     } catch (err) {
       toast.error("An unexpected error occurred")
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -65,7 +54,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -73,29 +62,39 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
+                {...register("email")}
+                aria-invalid={errors.email ? "true" : "false"}
+                disabled={isSubmitting}
               />
-              <FieldDescription>
-                We&apos;ll use this to contact you. We will not share your email
-                with anyone else.
-              </FieldDescription>
+              {errors.email ? (
+                <FieldDescription className="text-destructive">
+                  {errors.email.message}
+                </FieldDescription>
+              ) : (
+                <FieldDescription>
+                  We&apos;ll use this to contact you. We will not share your email
+                  with anyone else.
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
+                {...register("password")}
+                aria-invalid={errors.password ? "true" : "false"}
+                disabled={isSubmitting}
               />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
+              {errors.password ? (
+                <FieldDescription className="text-destructive">
+                  {errors.password.message}
+                </FieldDescription>
+              ) : (
+                <FieldDescription>
+                  Must be at least 8 characters long.
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="confirm-password">
@@ -104,17 +103,22 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <Input
                 id="confirm-password"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={loading}
+                {...register("confirmPassword")}
+                aria-invalid={errors.confirmPassword ? "true" : "false"}
+                disabled={isSubmitting}
               />
-              <FieldDescription>Please confirm your password.</FieldDescription>
+              {errors.confirmPassword ? (
+                <FieldDescription className="text-destructive">
+                  {errors.confirmPassword.message}
+                </FieldDescription>
+              ) : (
+                <FieldDescription>Please confirm your password.</FieldDescription>
+              )}
             </Field>
             <FieldGroup>
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Creating account..." : "Create Account"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating account..." : "Create Account"}
                 </Button>
                 <FieldDescription className="px-6 text-center">
                   Already have an account?{" "}

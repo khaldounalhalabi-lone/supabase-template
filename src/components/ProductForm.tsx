@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,6 +30,7 @@ import {
   type UpdateProductInput,
 } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { productSchema, type ProductFormData } from "@/lib/validations";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -40,31 +43,42 @@ export function ProductForm({
   onSuccess,
   onCancel,
 }: ProductFormProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [categoryId, setCategoryId] = useState("");
   const { createProduct, updateProduct } = useProducts();
   const { categories } = useCategories();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ProductFormData>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: product?.name || "",
+      description: product?.description || "",
+      price: product?.price || 0,
+      category_id: product?.category_id || "",
+    },
+  });
 
   useEffect(() => {
     if (product) {
-      setName(product.name);
-      setDescription(product.description || "");
-      setPrice(product.price.toString());
-      setCategoryId(product.category_id);
+      reset({
+        name: product.name,
+        description: product.description || "",
+        price: product.price,
+        category_id: product.category_id,
+      });
     }
-  }, [product]);
+  }, [product, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: ProductFormData) => {
     if (product) {
       const input: UpdateProductInput = {
-        name,
-        description: description || undefined,
-        price: parseFloat(price),
-        category_id: categoryId,
+        name: data.name,
+        description: data.description || undefined,
+        price: data.price,
+        category_id: data.category_id,
       };
       const { error } = await updateProduct(product.id, input);
       if (!error && onSuccess) {
@@ -72,17 +86,14 @@ export function ProductForm({
       }
     } else {
       const input: CreateProductInput = {
-        name,
-        description: description || undefined,
-        price: parseFloat(price),
-        category_id: categoryId,
+        name: data.name,
+        description: data.description || undefined,
+        price: data.price,
+        category_id: data.category_id,
       };
       const { error } = await createProduct(input);
       if (!error && onSuccess) {
-        setName("");
-        setDescription("");
-        setPrice("");
-        setCategoryId("");
+        reset();
         onSuccess();
       }
     }
@@ -97,7 +108,7 @@ export function ProductForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Name</FieldLabel>
@@ -105,10 +116,14 @@ export function ProductForm({
                 id="name"
                 type="text"
                 placeholder="Product name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                {...register("name")}
+                aria-invalid={errors.name ? "true" : "false"}
               />
+              {errors.name && (
+                <FieldDescription className="text-destructive">
+                  {errors.name.message}
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="description">Description</FieldLabel>
@@ -116,9 +131,14 @@ export function ProductForm({
                 id="description"
                 type="text"
                 placeholder="Product description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register("description")}
+                aria-invalid={errors.description ? "true" : "false"}
               />
+              {errors.description && (
+                <FieldDescription className="text-destructive">
+                  {errors.description.message}
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="price">Price</FieldLabel>
@@ -128,29 +148,46 @@ export function ProductForm({
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
+                {...register("price", { valueAsNumber: true })}
+                aria-invalid={errors.price ? "true" : "false"}
               />
+              {errors.price && (
+                <FieldDescription className="text-destructive">
+                  {errors.price.message}
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="category">Category</FieldLabel>
-              <Select value={categoryId} onValueChange={setCategoryId} required>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="category_id"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="category" aria-invalid={errors.category_id ? "true" : "false"}>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.category_id && (
+                <FieldDescription className="text-destructive">
+                  {errors.category_id.message}
+                </FieldDescription>
+              )}
             </Field>
             <Field>
               <div className="flex gap-2">
-                <Button type="submit">{product ? "Update" : "Create"}</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : product ? "Update" : "Create"}
+                </Button>
                 {onCancel && (
                   <Button type="button" variant="outline" onClick={onCancel}>
                     Cancel

@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate, Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -18,23 +19,25 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
 import { toast } from "sonner"
+import { loginSchema, type LoginFormData } from "@/lib/validations"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
   const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const { error } = await signIn(email, password)
+      const { error } = await signIn(data.email, data.password)
       if (error) {
         toast.error(error.message)
       } else {
@@ -43,8 +46,6 @@ export function LoginForm({
       }
     } catch (err) {
       toast.error("An unexpected error occurred")
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -58,7 +59,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -66,11 +67,15 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
+                  {...register("email")}
+                  aria-invalid={errors.email ? "true" : "false"}
+                  disabled={isSubmitting}
                 />
+                {errors.email && (
+                  <FieldDescription className="text-destructive">
+                    {errors.email.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -85,15 +90,19 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
+                  {...register("password")}
+                  aria-invalid={errors.password ? "true" : "false"}
+                  disabled={isSubmitting}
                 />
+                {errors.password && (
+                  <FieldDescription className="text-destructive">
+                    {errors.password.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}

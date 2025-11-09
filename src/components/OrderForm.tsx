@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react"
+import { useForm, useFieldArray, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -24,68 +25,58 @@ import {
 import { useOrders, type CreateOrderInput } from "@/hooks/useOrders"
 import { useProducts } from "@/hooks/useProducts"
 import { Plus, Trash2 } from "lucide-react"
-
-interface OrderItemInput {
-  product_id: string
-  quantity: number
-  price: number
-}
+import { orderSchema, type OrderFormData } from "@/lib/validations"
 
 export function OrderForm({ onSuccess, onCancel }: { onSuccess?: () => void; onCancel?: () => void }) {
-  const [items, setItems] = useState<OrderItemInput[]>([
-    { product_id: "", quantity: 1, price: 0 },
-  ])
-  const [status, setStatus] = useState<"pending" | "processing" | "shipped" | "delivered" | "cancelled">("pending")
   const { createOrder } = useOrders()
   const { products } = useProducts()
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<OrderFormData>({
+    resolver: zodResolver(orderSchema),
+    defaultValues: {
+      items: [{ product_id: "", quantity: 1, price: 0 }],
+      status: "pending",
+    },
+  })
 
-  const addItem = () => {
-    setItems([...items, { product_id: "", quantity: 1, price: 0 }])
-  }
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  })
 
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index))
-  }
-
-  const updateItem = (index: number, field: keyof OrderItemInput, value: string | number) => {
-    const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
-    
-    // Update price when product changes
-    if (field === "product_id") {
-      const product = products.find((p) => p.id === value)
-      if (product) {
-        newItems[index].price = product.price
-      }
-    }
-    
-    setItems(newItems)
-  }
+  const watchedItems = watch("items")
+  const watchedStatus = watch("status")
 
   const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    return watchedItems.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const validItems = items.filter((item) => item.product_id && item.quantity > 0)
-    if (validItems.length === 0) {
-      alert("Please add at least one item to the order")
-      return
-    }
-
+  const onSubmit = async (data: OrderFormData) => {
+    const validItems = data.items.filter((item) => item.product_id && item.quantity > 0)
+    
     const input: CreateOrderInput = {
       total_amount: calculateTotal(),
-      status,
+      status: data.status,
       items: validItems,
     }
 
     const { error } = await createOrder(input)
     if (!error && onSuccess) {
-      setItems([{ product_id: "", quantity: 1, price: 0 }])
-      setStatus("pending")
+      reset()
       onSuccess()
+    }
+  }
+
+  const handleProductChange = (index: number, productId: string) => {
+    const product = products.find((p) => p.id === productId)
+    if (product) {
+      setValue(`items.${index}.price`, product.price)
     }
   }
 
@@ -96,74 +87,134 @@ export function OrderForm({ onSuccess, onCancel }: { onSuccess?: () => void; onC
         <CardDescription>Add items to create a new order</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
               <FieldLabel>Order Items</FieldLabel>
-              {items.map((item, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <Select
-                    value={item.product_id}
-                    onValueChange={(value) => updateItem(index, "product_id", value)}
-                  >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Select product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} - ${product.price.toFixed(2)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    min="1"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 1)}
-                    className="w-20"
-                  />
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="Price"
-                    value={item.price}
-                    onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
-                    className="w-24"
-                  />
-                  {items.length > 1 && (
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 mb-2">
+                  <div className="flex-1">
+                    <Controller
+                      name={`items.${index}.product_id`}
+                      control={control}
+                      render={({ field: productField }) => (
+                        <Select
+                          value={productField.value}
+                          onValueChange={(value) => {
+                            productField.onChange(value)
+                            handleProductChange(index, value)
+                          }}
+                        >
+                          <SelectTrigger className="flex-1" aria-invalid={errors.items?.[index]?.product_id ? "true" : "false"}>
+                            <SelectValue placeholder="Select product" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map((product) => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name} - ${product.price.toFixed(2)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.items?.[index]?.product_id && (
+                      <FieldDescription className="text-destructive text-xs mt-1">
+                        {errors.items[index]?.product_id?.message}
+                      </FieldDescription>
+                    )}
+                  </div>
+                  <div className="w-20">
+                    <Controller
+                      name={`items.${index}.quantity`}
+                      control={control}
+                      render={({ field: quantityField }) => (
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="Qty"
+                          {...quantityField}
+                          value={quantityField.value || ""}
+                          onChange={(e) => quantityField.onChange(parseInt(e.target.value) || 1)}
+                          aria-invalid={errors.items?.[index]?.quantity ? "true" : "false"}
+                        />
+                      )}
+                    />
+                    {errors.items?.[index]?.quantity && (
+                      <FieldDescription className="text-destructive text-xs mt-1">
+                        {errors.items[index]?.quantity?.message}
+                      </FieldDescription>
+                    )}
+                  </div>
+                  <div className="w-24">
+                    <Controller
+                      name={`items.${index}.price`}
+                      control={control}
+                      render={({ field: priceField }) => (
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="Price"
+                          {...priceField}
+                          value={priceField.value || ""}
+                          onChange={(e) => priceField.onChange(parseFloat(e.target.value) || 0)}
+                          aria-invalid={errors.items?.[index]?.price ? "true" : "false"}
+                        />
+                      )}
+                    />
+                    {errors.items?.[index]?.price && (
+                      <FieldDescription className="text-destructive text-xs mt-1">
+                        {errors.items[index]?.price?.message}
+                      </FieldDescription>
+                    )}
+                  </div>
+                  {fields.length > 1 && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeItem(index)}
+                      onClick={() => remove(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={addItem} className="w-full">
+              {errors.items && typeof errors.items === "object" && "root" in errors.items && (
+                <FieldDescription className="text-destructive">
+                  {errors.items.root?.message}
+                </FieldDescription>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => append({ product_id: "", quantity: 1, price: 0 })}
+                className="w-full"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Item
               </Button>
             </Field>
             <Field>
               <FieldLabel htmlFor="status">Status</FieldLabel>
-              <Select value={status} onValueChange={(value: any) => setStatus(value)}>
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="shipped">Shipped</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="processing">Processing</SelectItem>
+                      <SelectItem value="shipped">Shipped</SelectItem>
+                      <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
             <Field>
               <FieldLabel>Total Amount</FieldLabel>
@@ -171,7 +222,9 @@ export function OrderForm({ onSuccess, onCancel }: { onSuccess?: () => void; onC
             </Field>
             <Field>
               <div className="flex gap-2">
-                <Button type="submit">Create Order</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Order"}
+                </Button>
                 {onCancel && (
                   <Button type="button" variant="outline" onClick={onCancel}>
                     Cancel
