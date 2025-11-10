@@ -53,10 +53,6 @@ export class ApiResponse<T = unknown> {
     this._code = HttpStatus.NOT_ACCEPTABLE;
     return this;
   }
-  unverifiedEmail(): this {
-    this._code = HttpStatus.UNVERIFIED_EMAIL;
-    return this;
-  }
 
   // ---------- Mutators ----------
   headers(input: HeadersInit): this {
