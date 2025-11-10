@@ -111,7 +111,9 @@ export function useProducts() {
           *,
           category:categories(id, name)
         `)
-        .single()
+        .single();
+
+      // supabase.functions.invoke('send-order-notification');
 
       if (createError) throw createError
 

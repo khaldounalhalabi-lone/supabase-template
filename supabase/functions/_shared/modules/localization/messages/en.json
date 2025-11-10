@@ -1,0 +1,9 @@
+{
+  "success": "Success",
+  "failed": "Failed",
+  "get_successfully": "Fetched successfully",
+  "stored_successfully": "Stored successfully",
+  "update_successfully": "Updated successfully",
+  "delete_successfully": "Deleted successfully",
+  "there_is_no_data": "There is no data"
+}
