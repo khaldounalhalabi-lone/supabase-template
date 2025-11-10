@@ -1,6 +1,3 @@
 {
-  "imports": {
-    "@/shared/": "./",
-    "i18n": "https://cdn.jsdelivr.net/npm/i18next@25.6.1/+esm"
-  }
+  "importMap": "../import_map.json"
 }
