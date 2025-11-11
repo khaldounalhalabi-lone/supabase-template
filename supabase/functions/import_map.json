@@ -2,7 +2,7 @@
   "imports": {
     "@/shared/": "./_shared/",
     "i18n": "https://cdn.jsdelivr.net/npm/i18next@25.6.1/+esm",
-    "supabase": "https://esm.sh/@supabase/supabase-js@2.80.0"
+    "supabase": "https://esm.sh/@supabase/supabase-js@2.80.0",
+    "hono": "jsr:@hono/hono"
   }
 }
-

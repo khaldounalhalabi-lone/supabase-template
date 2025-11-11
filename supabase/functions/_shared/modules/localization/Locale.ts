@@ -1,17 +1,16 @@
 import i18next from "i18n";
 import en from "@/shared/modules/localization/messages/en.json" assert { type: "json" };
-
 type TranslationSchema = typeof en;
 
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
 
-type DeepKeys<T> = (
-  T extends object
-    ? { [K in keyof T]: `${Extract<K, string>}${DotPrefix<DeepKeys<T[K]>>}` }[keyof T]
-    : ""
-  );
+type DeepKeys<T> = T extends object
+  ? {
+      [K in keyof T]: `${Extract<K, string>}${DotPrefix<DeepKeys<T[K]>>}`;
+    }[keyof T]
+  : "";
 
-export type LocaleMessageKey =  DeepKeys<TranslationSchema>
+export type LocaleMessageKey = DeepKeys<TranslationSchema>;
 
 class Locale {
   private static instance: Locale;
