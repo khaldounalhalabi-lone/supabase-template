@@ -1,27 +1,21 @@
-import App from "../bootstrap/App.ts";
 import Route from "./Route.ts";
-import Middleware from "../middlewares/contracts/Middleware.ts";
-import RouteMethods from "./RouteMethods.ts";
+import RouteMethods from "./enums/RouteMethods.ts";
+import { MiddlewareName } from "../../middlewares/Kernel.ts";
 
 class RouterRegistry {
-  private app: App;
   private static routes: Route[] = [];
-
-  constructor(app: App) {
-    this.app = app;
-  }
 
   public static get(
     url: string,
     handler: CallableFunction,
-    middlewares: Middleware[] = [],
-    excludedMiddlewares: Middleware[] = [],
+    middlewareNames: MiddlewareName[] = [],
+    excludedMiddlewareNames: MiddlewareName[] = [],
   ) {
     const route = new Route(
       url,
       handler,
-      middlewares,
-      excludedMiddlewares,
+      middlewareNames,
+      excludedMiddlewareNames,
       RouteMethods.GET,
     );
     this.routes.push(route);
@@ -30,14 +24,14 @@ class RouterRegistry {
   public static post(
     url: string,
     handler: CallableFunction,
-    middlewares: Middleware[] = [],
-    excludedMiddlewares: Middleware[] = [],
+    middlewareNames: MiddlewareName[] = [],
+    excludedMiddlewareNames: MiddlewareName[] = [],
   ) {
     const route = new Route(
       url,
       handler,
-      middlewares,
-      excludedMiddlewares,
+      middlewareNames,
+      excludedMiddlewareNames,
       RouteMethods.POST,
     );
     this.routes.push(route);
@@ -46,14 +40,14 @@ class RouterRegistry {
   public static put(
     url: string,
     handler: CallableFunction,
-    middlewares: Middleware[] = [],
-    excludedMiddlewares: Middleware[] = [],
+    middlewareNames: MiddlewareName[] = [],
+    excludedMiddlewareNames: MiddlewareName[] = [],
   ) {
     const route = new Route(
       url,
       handler,
-      middlewares,
-      excludedMiddlewares,
+      middlewareNames,
+      excludedMiddlewareNames,
       RouteMethods.PUT,
     );
     this.routes.push(route);
@@ -62,21 +56,21 @@ class RouterRegistry {
   public static delete(
     url: string,
     handler: CallableFunction,
-    middlewares: Middleware[] = [],
-    excludedMiddlewares: Middleware[] = [],
+    middlewareNames: MiddlewareName[] = [],
+    excludedMiddlewareNames: MiddlewareName[] = [],
   ) {
     const route = new Route(
       url,
       handler,
-      middlewares,
-      excludedMiddlewares,
+      middlewareNames,
+      excludedMiddlewareNames,
       RouteMethods.DELETE,
     );
     this.routes.push(route);
   }
 
-  get routes(): Route[] {
-    return RouterRegistry.routes;
+  public static getRoutes(): Route[] {
+    return this.routes;
   }
 }
 

@@ -1,24 +1,24 @@
-import Middleware from "../middlewares/contracts/Middleware.ts";
 import RouteMethods from "./enums/RouteMethods.ts";
+import { MiddlewareName } from "../../middlewares/Kernel.ts";
 
 class Route {
   private readonly _url: string;
   private readonly _handler: CallableFunction;
-  private readonly _middlewares: Middleware[];
-  private readonly _excludedMiddlewares: Middleware[];
+  private readonly _middlewareNames: string[];
+  private readonly _excludedMiddlewareNames: MiddlewareName[];
   private readonly _method: RouteMethods;
 
   constructor(
     url: string,
     handler: CallableFunction,
-    middlewares: Middleware[],
-    excludedMiddlewares: Middleware[],
+    middlewareNames: string[],
+    excludedMiddlewareNames: string[],
     method: RouteMethods,
   ) {
     this._url = url;
     this._handler = handler;
-    this._middlewares = middlewares;
-    this._excludedMiddlewares = excludedMiddlewares;
+    this._middlewareNames = middlewareNames;
+    this._excludedMiddlewareNames = excludedMiddlewareNames;
     this._method = method;
   }
 
@@ -30,12 +30,12 @@ class Route {
     return this._handler;
   }
 
-  get middlewares(): Middleware[] {
-    return this._middlewares;
+  get middlewareNames(): MiddlewareName[] {
+    return this._middlewareNames;
   }
 
-  get excludedMiddlewares(): Middleware[] {
-    return this._excludedMiddlewares;
+  get excludedMiddlewareNames(): MiddlewareName[] {
+    return this._excludedMiddlewareNames;
   }
 
   get method(): RouteMethods {
