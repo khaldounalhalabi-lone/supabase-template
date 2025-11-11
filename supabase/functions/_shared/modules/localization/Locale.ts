@@ -1,5 +1,6 @@
 import i18next from "i18n";
 import en from "@/shared/modules/localization/messages/en.json" assert { type: "json" };
+import de from "@/shared/modules/localization/messages/de.json" assert { type: "json" };
 type TranslationSchema = typeof en;
 
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
@@ -22,6 +23,9 @@ class Locale {
       resources: {
         en: {
           translation: en,
+        },
+        de: {
+          translation: de,
         },
       },
     });

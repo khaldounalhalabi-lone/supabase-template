@@ -1,5 +1,5 @@
-import HttpStatus from "./enums/HttpStatus.ts";
-import { trans } from "@/shared/modules/localization/helpers.ts";
+import HttpStatus from "@/shared/modules/response/enums/HttpStatus.ts";
+import { trans } from "@/shared/modules/localization/Helpers.ts";
 
 export class ApiResponse<T = unknown> {
   public _code: number;

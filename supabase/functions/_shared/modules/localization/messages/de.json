@@ -1,0 +1,9 @@
+{
+  "success": "Erfolg",
+  "failed": "Fehlgeschlagen",
+  "get_successfully": "Erfolgreich abgerufen",
+  "stored_successfully": "Erfolgreich gespeichert",
+  "update_successfully": "Erfolgreich aktualisiert",
+  "delete_successfully": "Erfolgreich gelöscht",
+  "there_is_no_data": "Keine Daten vorhanden"
+}

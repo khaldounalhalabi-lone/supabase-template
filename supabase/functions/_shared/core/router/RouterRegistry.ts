@@ -1,6 +1,6 @@
-import Route from "./Route.ts";
-import RouteMethods from "./enums/RouteMethods.ts";
-import { MiddlewareName } from "../../middlewares/Kernel.ts";
+import Route from "@/shared/core/router/Route.ts";
+import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
+import { MiddlewareName } from "@/shared/bootstrap.ts";
 
 class RouterRegistry {
   private static routes: Route[] = [];

@@ -1,5 +1,5 @@
-import RouteMethods from "./enums/RouteMethods.ts";
-import { MiddlewareName } from "../../middlewares/Kernel.ts";
+import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
+import { MiddlewareName } from "@/shared/bootstrap.ts";
 
 class Route {
   private readonly _url: string;

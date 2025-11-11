@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import MiddlewareRegistry from "../middlewares/MiddlewareRegistry.ts";
-import RouterRegistry from "../router/RouterRegistry.ts";
-import RouteMethods from "../router/enums/RouteMethods.ts";
-import { MiddlewareAdapter } from "../middlewares/MiddlewareAdapter.ts";
-import { APP_MIDDLEWARES, GLOBAL_MIDDLEWARES } from "../../middlewares/Kernel.ts";
+import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts";
+import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
+import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
+import { MiddlewareAdapter } from "@/shared/core/middlewares/MiddlewareAdapter.ts";
+import { APP_MIDDLEWARES, GLOBAL_MIDDLEWARES } from "@/shared/bootstrap.ts";
 
 /**
  * Application class for managing routes and middleware.
@@ -17,7 +17,7 @@ class App {
 
   /**
    * Create a new App instance.
-   * 
+   *
    * @param options - Configuration options
    * @param options.exclude - Array of middleware identifiers to exclude from global middleware
    */
@@ -39,8 +39,15 @@ class App {
    */
   private initializeMiddlewareRegistry(): void {
     // Register all middleware classes
-    for (const [identifier, MiddlewareClass] of Object.entries(APP_MIDDLEWARES)) {
-      this.middlewareRegistry.registerMiddlewareClass(identifier, MiddlewareClass);
+    for (
+      const [identifier, MiddlewareClass] of Object.entries(
+        APP_MIDDLEWARES,
+      )
+    ) {
+      this.middlewareRegistry.registerMiddlewareClass(
+        identifier,
+        MiddlewareClass,
+      );
     }
 
     // Register global middleware
@@ -60,19 +67,26 @@ class App {
       // Get global middlewares, excluding:
       // 1. App-level exclusions (from constructor)
       // 2. Route-specific exclusions
-      const routeExclusions = [...this.exclude, ...route.excludedMiddlewareNames];
-      const globalMiddlewares = this.middlewareRegistry.getGlobalMiddlewares(routeExclusions);
-      
+      const routeExclusions = [
+        ...this.exclude,
+        ...route.excludedMiddlewareNames,
+      ];
+      const globalMiddlewares = this.middlewareRegistry.getGlobalMiddlewares(
+        routeExclusions,
+      );
+
       // Get route-specific middlewares
-      const routeMiddlewares = this.middlewareRegistry.getMiddlewares(route.middlewareNames);
-      
+      const routeMiddlewares = this.middlewareRegistry.getMiddlewares(
+        route.middlewareNames,
+      );
+
       // Combine: global (with exclusions) + route-specific
       const allMiddlewares = [...globalMiddlewares, ...routeMiddlewares];
 
       // Register route with Hono based on method
       if (allMiddlewares.length > 0) {
         const middlewareFn = MiddlewareAdapter.createMiddleware(allMiddlewares);
-        
+
         switch (route.method) {
           case RouteMethods.GET:
             this.honoApp.get(route.url, middlewareFn, route.handler);
