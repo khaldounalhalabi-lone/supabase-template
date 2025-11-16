@@ -13,7 +13,7 @@ export class MiddlewareAdapter {
 
     middlewares.forEach((middleware) => {
       const callback = this.honoFactory.createMiddleware(async (c, next) => {
-        await middleware.handle(c, next);
+        return await middleware.handle(c, next);
       });
       middlewareCallbacks.push(callback);
     });

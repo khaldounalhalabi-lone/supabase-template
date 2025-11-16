@@ -13,7 +13,7 @@ class AcceptLanguageMiddleware implements Middleware {
 
     c.set("locale", locale);
 
-    await next();
+    return await next();
   }
 
   private parseAcceptLanguage(acceptLanguage: string): string {

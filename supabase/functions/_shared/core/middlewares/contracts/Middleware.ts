@@ -11,7 +11,7 @@ interface Middleware {
    * @param next - Function to call the next middleware/handler in the chain
    * @returns Response or Promise<Response>
    */
-  handle(c: Context, next: Next): Promise<Response | void>;
+  handle(c: Context, next: Next): Promise<Response | void> | Response;
 }
 
 export type MiddlewareClassType = new (...args: never[]) => Middleware;

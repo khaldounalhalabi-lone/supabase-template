@@ -26,7 +26,7 @@ class AuthMiddleware implements Middleware {
         .send();
     }
 
-    await next();
+    return await next();
   }
 }
 
