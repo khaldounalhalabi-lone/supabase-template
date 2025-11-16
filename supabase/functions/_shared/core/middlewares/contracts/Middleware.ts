@@ -14,6 +14,4 @@ interface Middleware {
   handle(c: Context, next: Next): Promise<Response | void> | Response;
 }
 
-export type MiddlewareClassType = new (...args: never[]) => Middleware;
-
 export default Middleware;

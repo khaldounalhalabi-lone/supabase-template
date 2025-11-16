@@ -1,18 +1,19 @@
-import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
 import { MiddlewareName } from "@/shared/bootstrap.ts";
+import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
+import { RouterHandler } from "../../types/routes.types.ts";
 
 class Route {
   private readonly _url: string;
-  private readonly _handler: CallableFunction;
-  private readonly _middlewareNames: string[];
+  private readonly _handler: RouterHandler;
+  private readonly _middlewareNames: MiddlewareName[];
   private readonly _excludedMiddlewareNames: MiddlewareName[];
   private readonly _method: RouteMethods;
 
   constructor(
     url: string,
-    handler: CallableFunction,
-    middlewareNames: string[],
-    excludedMiddlewareNames: string[],
+    handler: RouterHandler,
+    middlewareNames: MiddlewareName[],
+    excludedMiddlewareNames: MiddlewareName[],
     method: RouteMethods,
   ) {
     this._url = url;
@@ -26,7 +27,7 @@ class Route {
     return this._url;
   }
 
-  get handler(): CallableFunction {
+  get handler(): RouterHandler {
     return this._handler;
   }
 

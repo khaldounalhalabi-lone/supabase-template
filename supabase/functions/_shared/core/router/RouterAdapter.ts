@@ -1,5 +1,5 @@
-import { MiddlewareHandler } from "hono/types";
 import App from "../bootstrap/App.ts";
+import ControllerAdapter from "../controllers/ControllerAdapter.ts";
 import { MiddlewareAdapter } from "../middlewares/MiddlewareAdapter.ts";
 import MiddlewareRegistry from "../middlewares/MiddlewareRegistry.ts";
 import RouteMethods from "./enums/RouteMethods.ts";
@@ -9,6 +9,7 @@ class RouterAdapter {
   constructor(
     public middlewareRegistry: MiddlewareRegistry,
     public middlewareAdapter: MiddlewareAdapter,
+    public controllerAdapter: ControllerAdapter,
   ) {}
 
   public registerRoutes(routes: Route[]): void {
@@ -25,7 +26,7 @@ class RouterAdapter {
 
       const allMiddlewares = [...globalMiddlewares, ...routeMiddlewares];
 
-      const handler = route.handler as MiddlewareHandler;
+      const handler = this.controllerAdapter.createController(route.handler);
 
       if (allMiddlewares.length > 0) {
         const middlewaresCallbacks =

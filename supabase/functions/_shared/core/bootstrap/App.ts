@@ -4,15 +4,14 @@ import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts"
 import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
 import { Hono } from "hono";
 import { createFactory } from "hono/factory";
+import { HonoFactory } from "../../types/hono.types.ts";
 import RouterAdapter from "../router/RouterAdapter.ts";
-
-export type MiddlewareFactory = ReturnType<typeof createFactory>;
 
 class App {
   public readonly honoApp: Hono;
   private middlewareRegistry: MiddlewareRegistry;
   private routeRegistry: RouterRegistry;
-  private honoFactory: MiddlewareFactory;
+  private honoFactory: HonoFactory;
   private static instance: App | null = null;
   private middlewareAdapter: MiddlewareAdapter;
   private routerAdapter: RouterAdapter;

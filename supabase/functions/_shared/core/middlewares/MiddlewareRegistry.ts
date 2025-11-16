@@ -1,6 +1,5 @@
-import type Middleware, {
-  MiddlewareClassType,
-} from "@/shared/core/middlewares/contracts/Middleware.ts";
+import { MiddlewareClassType } from "../../types/middlewares.types.ts";
+import Middleware from "./contracts/Middleware.ts";
 
 class MiddlewareRegistry {
   private middlewareClasses: Map<string, new (...args: never[]) => Middleware> =
