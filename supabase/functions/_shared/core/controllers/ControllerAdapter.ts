@@ -11,12 +11,14 @@ class ControllerAdapter {
       return this.honoFactory.createHandlers(async (c) => {
         const controllerInstance = new controller();
         if (method in controllerInstance) {
-          return await controllerInstance[method](c);
-        } else {
-          throw new Error(
-            `Method ${method} not found in controller ${controller.name}`,
-          );
+          const methodFn = Reflect.get(controllerInstance, method);
+          if (typeof methodFn === 'function') {
+            return await methodFn(c);
+          }
         }
+        throw new Error(
+          `Method ${method} not found in controller ${controller.name}`,
+        );
       });
     } else {
       return this.honoFactory.createHandlers((c) => {
