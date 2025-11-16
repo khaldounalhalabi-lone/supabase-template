@@ -1,4 +1,5 @@
 import { APP_MIDDLEWARES, GLOBAL_MIDDLEWARES } from "@/shared/bootstrap.ts";
+import ControllerAdapter from "@/shared/core/controllers/ControllerAdapter.ts";
 import { MiddlewareAdapter } from "@/shared/core/middlewares/MiddlewareAdapter.ts";
 import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts";
 import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
@@ -14,17 +15,20 @@ class App {
   private honoFactory: HonoFactory;
   private static instance: App | null = null;
   private middlewareAdapter: MiddlewareAdapter;
+  private controllerAdapter: ControllerAdapter;
   private routerAdapter: RouterAdapter;
 
   private constructor() {
-    this.honoApp = new Hono();
+    this.honoFactory = createFactory();
+    this.honoApp = this.honoFactory.createApp();
     this.middlewareRegistry = new MiddlewareRegistry();
     this.routeRegistry = new RouterRegistry();
-    this.honoFactory = createFactory();
     this.middlewareAdapter = new MiddlewareAdapter(this.honoFactory);
+    this.controllerAdapter = new ControllerAdapter(this.honoFactory);
     this.routerAdapter = new RouterAdapter(
       this.middlewareRegistry,
       this.middlewareAdapter,
+      this.controllerAdapter,
     );
 
     this.initializeMiddlewareRegistry();

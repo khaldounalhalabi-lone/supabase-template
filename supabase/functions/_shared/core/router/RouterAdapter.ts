@@ -34,31 +34,47 @@ class RouterAdapter {
 
         switch (route.method) {
           case RouteMethods.GET:
-            app.honoApp.get(route.url, ...middlewaresCallbacks, handler);
+            app.honoApp.get(
+              route.url,
+              ...middlewaresCallbacks,
+              ...handler,
+            );
             break;
           case RouteMethods.POST:
-            app.honoApp.post(route.url, ...middlewaresCallbacks, handler);
+            app.honoApp.post(
+              route.url,
+              ...middlewaresCallbacks,
+              ...handler,
+            );
             break;
           case RouteMethods.PUT:
-            app.honoApp.put(route.url, ...middlewaresCallbacks, handler);
+            app.honoApp.put(
+              route.url,
+              ...middlewaresCallbacks,
+              ...handler,
+            );
             break;
           case RouteMethods.DELETE:
-            app.honoApp.delete(route.url, ...middlewaresCallbacks, handler);
+            app.honoApp.delete(
+              route.url,
+              ...middlewaresCallbacks,
+              ...handler,
+            );
             break;
         }
       } else {
         switch (route.method) {
           case RouteMethods.GET:
-            app.honoApp.get(route.url, handler);
+            app.honoApp.get(route.url, ...handler);
             break;
           case RouteMethods.POST:
-            app.honoApp.post(route.url, handler);
+            app.honoApp.post(route.url, ...handler);
             break;
           case RouteMethods.PUT:
-            app.honoApp.put(route.url, handler);
+            app.honoApp.put(route.url, ...handler);
             break;
           case RouteMethods.DELETE:
-            app.honoApp.delete(route.url, handler);
+            app.honoApp.delete(route.url, ...handler);
             break;
         }
       }

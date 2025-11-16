@@ -1,18 +1,26 @@
-import { HonoDefaultHandler, HonoFactory } from "../../types/hono.types.ts";
+import { ControllerCtor } from "../../types/controllers.types.ts";
+import { HonoFactory } from "../../types/hono.types.ts";
 import { RouterHandler } from "../../types/routes.types.ts";
 
 class ControllerAdapter {
   constructor(public honoFactory: HonoFactory) {}
 
-  public createController(handler: RouterHandler) {
+  public createController<T extends ControllerCtor>(handler: RouterHandler<T>) {
     if (Array.isArray(handler)) {
       const [controller, method] = handler;
       return this.honoFactory.createHandlers(async (c) => {
-        return await (controller[method] as HonoDefaultHandler)(c);
+        const controllerInstance = new controller();
+        if (method in controllerInstance) {
+          return await controllerInstance[method](c);
+        } else {
+          throw new Error(
+            `Method ${method} not found in controller ${controller.name}`,
+          );
+        }
       });
     } else {
-      return this.honoFactory.createHandlers(async (c) => {
-        return await handler(c);
+      return this.honoFactory.createHandlers((c) => {
+        return handler(c);
       });
     }
   }

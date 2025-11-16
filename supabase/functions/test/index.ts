@@ -1,21 +1,9 @@
 import { App } from "@/shared/bootstrap.ts";
-import { trans } from "@/shared/modules/localization/Helpers.ts";
-import { ApiResponse } from "@/shared/modules/response/ApiResponse.ts";
+import TestController from "@/shared/controllers/TestController.ts";
 
 const app = App.make();
 
-app.router.get(
-  "/test",
-  () => {
-    return ApiResponse.create()
-      .data({
-        message: trans("get_successfully"),
-      })
-      .ok()
-      .getSuccess()
-      .send();
-  },
-  ["accept-language", "auth"],
-);
+app.router.get("/test", [TestController, "index"], ["accept-language"]);
+app.router.get("/test/:id", [TestController, "show"], ["accept-language"]);
 
 Deno.serve(app.fetch());

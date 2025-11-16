@@ -1,17 +1,18 @@
 import { MiddlewareName } from "@/shared/bootstrap.ts";
 import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
 import { RouterHandler } from "../../types/routes.types.ts";
+import { ControllerCtor } from "../../types/controllers.types.ts";
 
-class Route {
+class Route<Controller extends ControllerCtor> {
   private readonly _url: string;
-  private readonly _handler: RouterHandler;
+  private readonly _handler: RouterHandler<Controller>;
   private readonly _middlewareNames: MiddlewareName[];
   private readonly _excludedMiddlewareNames: MiddlewareName[];
   private readonly _method: RouteMethods;
 
   constructor(
     url: string,
-    handler: RouterHandler,
+    handler: RouterHandler<Controller>,
     middlewareNames: MiddlewareName[],
     excludedMiddlewareNames: MiddlewareName[],
     method: RouteMethods,
@@ -27,7 +28,7 @@ class Route {
     return this._url;
   }
 
-  get handler(): RouterHandler {
+  get handler(): RouterHandler<Controller> {
     return this._handler;
   }
 
