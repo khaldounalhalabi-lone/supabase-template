@@ -20,7 +20,12 @@ export const APP_LOCALES = ["en", "de"];
 export const DEFAULT_LOCALE = "en";
 
 export function createApp(appCallback: (Router: RouterRegistry) => void) {
-  const app = App.make();
-  appCallback(app.router);
-  Deno.serve(app.fetch());
+  Deno.serve(async (req) => {
+    const app = App.make();
+    appCallback(app.router);
+    const fetch = app.fetch();
+    const res = await fetch(req);
+    App.destroy();
+    return res;
+  });
 }

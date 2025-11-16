@@ -5,8 +5,8 @@ import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts"
 import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
 import { Hono } from "hono";
 import { createFactory } from "hono/factory";
-import { HonoFactory } from "../types/hono.types.ts";
 import RouterAdapter from "../router/RouterAdapter.ts";
+import { HonoFactory } from "../types/hono.types.ts";
 
 class App {
   public readonly honoApp: Hono;
@@ -39,6 +39,10 @@ class App {
       this.instance = new App();
     }
     return this.instance;
+  }
+
+  public static destroy(): void {
+    this.instance = null;
   }
 
   private initializeMiddlewareRegistry(): void {
