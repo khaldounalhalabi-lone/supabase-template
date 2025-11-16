@@ -1,4 +1,4 @@
-import { ControllerCtor, PublicMethodNames } from "./controllers.types.ts";
+import { ControllerClass, PublicMethodNames } from "./controllers.types.ts";
 import { HonoDefaultHandler } from "./hono.types.ts";
 
 /**
@@ -21,7 +21,7 @@ import { HonoDefaultHandler } from "./hono.types.ts";
  * ];
  * ```
  */
-export type RouterArrayHandler<Ctor extends ControllerCtor> = [
+export type RouterArrayHandler<Ctor extends ControllerClass> = [
   ctor: Ctor,
   method: PublicMethodNames<InstanceType<Ctor>>,
 ];
@@ -50,7 +50,7 @@ export type RouterArrayHandler<Ctor extends ControllerCtor> = [
  * };
  * ```
  */
-export type RouterHandler<Controller extends ControllerCtor> =
+export type RouterHandler<Controller extends ControllerClass> =
   | RouterArrayHandler<Controller>
   | HonoDefaultHandler;
 

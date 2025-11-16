@@ -1,20 +1,6 @@
 import Controller from "../controllers/contracts/Controller.ts";
 
 /**
- * Represents a constructor function that creates a Controller instance.
- * This type is used for controller classes that can be instantiated without arguments.
- *
- * @example
- * ```typescript
- * class MyController extends Controller {
- *   // ...
- * }
- * const ControllerClass: ControllerClassType = MyController;
- * ```
- */
-export type ControllerClassType = new () => Controller;
-
-/**
  * Extracts all public method names from a type that are callable functions.
  * This utility type filters out properties that are not functions and returns
  * only the method names as a string union type.
@@ -52,7 +38,4 @@ export type PublicMethodNames<T> = {
  * const ctor: ControllerCtor<MyController> = MyController;
  * ```
  */
-export type ControllerCtor<T extends Controller = Controller> = new (
-  ...args: unknown[]
-) => T;
-
+export type ControllerClass<T extends Controller = Controller> = new () => T;

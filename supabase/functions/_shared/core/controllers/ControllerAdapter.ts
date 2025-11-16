@@ -1,11 +1,11 @@
-import { ControllerCtor } from "../types/controllers.types.ts";
+import { ControllerClass } from "../types/controllers.types.ts";
 import { HonoFactory } from "../types/hono.types.ts";
 import { RouterHandler } from "../types/routes.types.ts";
 
 class ControllerAdapter {
   constructor(public honoFactory: HonoFactory) {}
 
-  public createController<T extends ControllerCtor>(handler: RouterHandler<T>) {
+  public createController<T extends ControllerClass>(handler: RouterHandler<T>) {
     if (Array.isArray(handler)) {
       const [controller, method] = handler;
       return this.honoFactory.createHandlers(async (c) => {
