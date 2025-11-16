@@ -2,6 +2,7 @@ import App from "../bootstrap/App.ts";
 import ControllerAdapter from "../controllers/ControllerAdapter.ts";
 import { MiddlewareAdapter } from "../middlewares/MiddlewareAdapter.ts";
 import MiddlewareRegistry from "../middlewares/MiddlewareRegistry.ts";
+import { ControllerCtor } from "../types/controllers.types.ts";
 import RouteMethods from "./enums/RouteMethods.ts";
 import Route from "./Route.ts";
 
@@ -12,7 +13,7 @@ class RouterAdapter {
     public controllerAdapter: ControllerAdapter,
   ) {}
 
-  public registerRoutes(routes: Route[]): void {
+  public registerRoutes(routes: Route<ControllerCtor>[]): void {
     const app = App.make();
 
     for (const route of routes) {
