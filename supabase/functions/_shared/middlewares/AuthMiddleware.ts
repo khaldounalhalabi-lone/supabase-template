@@ -1,12 +1,12 @@
-import type { Context } from "hono";
 import type Middleware from "@/shared/core/middlewares/contracts/Middleware.ts";
 import { ApiResponse } from "@/shared/modules/response/ApiResponse.ts";
 import { supabaseClient } from "@/shared/modules/supabase/client.ts";
+import type { Context, Next } from "hono";
 
 class AuthMiddleware implements Middleware {
-  async handle(c: Context, next: () => Promise<Response>): Promise<Response> {
+  async handle(c: Context, next: Next): Promise<Response | void> {
     const authHeader = c.req.header("Authorization");
-
+    console.log(authHeader);
     if (!authHeader) {
       return ApiResponse.create()
         .notAuthorized()
@@ -26,7 +26,7 @@ class AuthMiddleware implements Middleware {
         .send();
     }
 
-    return await next();
+    await next();
   }
 }
 

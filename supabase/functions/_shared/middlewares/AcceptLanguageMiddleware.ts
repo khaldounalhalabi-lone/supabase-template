@@ -1,21 +1,19 @@
-import type { Context } from "hono";
+import { APP_LOCALES, DEFAULT_LOCALE } from "@/shared/bootstrap.ts";
 import type Middleware from "@/shared/core/middlewares/contracts/Middleware.ts";
 import Locale from "@/shared/modules/localization/Locale.ts";
-import { APP_LOCALES, DEFAULT_LOCALE } from "@/shared/bootstrap.ts";
+import type { Context, Next } from "hono";
 
 class AcceptLanguageMiddleware implements Middleware {
-  async handle(c: Context, next: () => Promise<Response>): Promise<Response> {
+  async handle(c: Context, next: Next): Promise<Response | void> {
     const acceptLanguage = c.req.header("Accept-Language");
 
-    const locale = this.parseAcceptLanguage(
-      acceptLanguage || this.defaultLocale,
-    );
+    const locale = this.parseAcceptLanguage(acceptLanguage ?? DEFAULT_LOCALE);
 
     Locale.make().setLocale(locale);
 
     c.set("locale", locale);
 
-    return await next();
+    await next();
   }
 
   private parseAcceptLanguage(acceptLanguage: string): string {

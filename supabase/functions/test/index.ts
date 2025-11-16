@@ -1,10 +1,12 @@
-import { ApiResponse } from "@/shared/modules/response/ApiResponse.ts";
-import { App, Route } from "@/shared/bootstrap.ts";
+import { App } from "@/shared/bootstrap.ts";
 import { trans } from "@/shared/modules/localization/Helpers.ts";
+import { ApiResponse } from "@/shared/modules/response/ApiResponse.ts";
 
-Route.get(
+const app = App.make();
+
+app.router.get(
   "/test",
-  async () => {
+  () => {
     return ApiResponse.create()
       .data({
         message: trans("get_successfully"),
@@ -13,8 +15,7 @@ Route.get(
       .getSuccess()
       .send();
   },
-  ["accept-language"],
+  ["accept-language", "auth"],
 );
 
-const app = new App();
 Deno.serve(app.fetch());

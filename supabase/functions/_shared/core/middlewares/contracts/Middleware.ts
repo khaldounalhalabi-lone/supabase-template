@@ -1,8 +1,8 @@
 import type { Context } from "hono";
+import { Next } from "hono/types";
 
 /**
  * Middleware contract that all middlewares must implement.
- * Similar to Laravel's middleware interface, adapted for Hono.
  */
 interface Middleware {
   /**
@@ -11,10 +11,7 @@ interface Middleware {
    * @param next - Function to call the next middleware/handler in the chain
    * @returns Response or Promise<Response>
    */
-  handle(
-    c: Context,
-    next: () => Promise<Response>,
-  ): Promise<Response> | Response;
+  handle(c: Context, next: Next): Promise<Response | void>;
 }
 
 export type MiddlewareClassType = new (...args: never[]) => Middleware;

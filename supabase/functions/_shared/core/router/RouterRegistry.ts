@@ -3,14 +3,16 @@ import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
 import { MiddlewareName } from "@/shared/bootstrap.ts";
 
 class RouterRegistry {
-  private static routes: Route[] = [];
+  private routes: Route[] = [];
 
-  public static get(
+  constructor() {}
+
+  public get(
     url: string,
     handler: CallableFunction,
     middlewareNames: MiddlewareName[] = [],
     excludedMiddlewareNames: MiddlewareName[] = [],
-  ) {
+  ): void {
     const route = new Route(
       url,
       handler,
@@ -21,7 +23,7 @@ class RouterRegistry {
     this.routes.push(route);
   }
 
-  public static post(
+  public post(
     url: string,
     handler: CallableFunction,
     middlewareNames: MiddlewareName[] = [],
@@ -37,7 +39,7 @@ class RouterRegistry {
     this.routes.push(route);
   }
 
-  public static put(
+  public put(
     url: string,
     handler: CallableFunction,
     middlewareNames: MiddlewareName[] = [],
@@ -53,7 +55,7 @@ class RouterRegistry {
     this.routes.push(route);
   }
 
-  public static delete(
+  public delete(
     url: string,
     handler: CallableFunction,
     middlewareNames: MiddlewareName[] = [],
@@ -69,7 +71,7 @@ class RouterRegistry {
     this.routes.push(route);
   }
 
-  public static getRoutes(): Route[] {
+  public getRoutes(): Route[] {
     return this.routes;
   }
 }

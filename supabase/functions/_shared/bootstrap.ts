@@ -17,5 +17,4 @@ export const APP_LOCALES = ["en", "de"];
 
 export const DEFAULT_LOCALE = "en";
 
-export { default as App } from "./core/bootstrap/App.ts";
-export { RouteRegistry as Route } from "./core/router/RouterRegistry.ts";
+export { default as App } from "@/shared/core/bootstrap/App.ts";
