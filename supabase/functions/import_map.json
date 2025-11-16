@@ -4,7 +4,6 @@
     "i18n": "https://cdn.jsdelivr.net/npm/i18next@25.6.1/+esm",
     "supabase": "https://esm.sh/@supabase/supabase-js@2.80.0",
     "hono": "jsr:@hono/hono",
-    "hono/factory": "jsr:@hono/hono/factory",
-    "hono/types": "jsr:@hono/hono/types"
+    "hono/factory": "jsr:@hono/hono/factory"
   }
 }

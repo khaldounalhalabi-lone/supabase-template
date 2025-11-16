@@ -1,5 +1,4 @@
-import type { Context } from "hono";
-import { Next } from "hono/types";
+import type { Context, Next } from "hono";
 
 /**
  * Middleware contract that all middlewares must implement.
