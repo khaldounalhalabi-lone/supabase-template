@@ -25,17 +25,19 @@ export type PublicMethodNames<T> = {
 
 /**
  * Represents a constructor function for a Controller class.
- * This type allows for controllers that may require constructor arguments.
+ * This type is used for controller classes that can be instantiated without arguments.
  *
  * @template T - The specific Controller type that this constructor creates (defaults to Controller)
- * @returns A constructor function that creates an instance of type T
+ * @returns A constructor function that creates an instance of type T with no arguments
  *
  * @example
  * ```typescript
  * class MyController extends Controller {
- *   constructor(private config: Config) {}
+ *   public index(c: Context) {
+ *     return new Response();
+ *   }
  * }
- * const ctor: ControllerCtor<MyController> = MyController;
+ * const ControllerClass: ControllerClass<MyController> = MyController;
  * ```
  */
 export type ControllerClass<T extends Controller = Controller> = new () => T;

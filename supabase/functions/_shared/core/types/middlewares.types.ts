@@ -16,5 +16,5 @@ import Middleware from "../middlewares/contracts/Middleware.ts";
  * const MiddlewareClass: MiddlewareClassType = AuthMiddleware;
  * ```
  */
-export type MiddlewareClassType = new (...args: never[]) => Middleware;
+export type MiddlewareClassType = new () => Middleware;
 
