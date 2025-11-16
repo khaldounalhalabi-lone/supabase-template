@@ -1,7 +1,7 @@
 import { MiddlewareName } from "@/shared/bootstrap.ts";
 import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
-import { RouterHandler } from "../../types/routes.types.ts";
-import { ControllerCtor } from "../../types/controllers.types.ts";
+import { RouterHandler } from "../types/routes.types.ts";
+import { ControllerCtor } from "../types/controllers.types.ts";
 
 class Route<Controller extends ControllerCtor> {
   private readonly _url: string;

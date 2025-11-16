@@ -7,3 +7,4 @@ export type RouterArrayHandler<Ctor extends ControllerCtor> = [
 export type RouterHandler<Controller extends ControllerCtor> =
   | RouterArrayHandler<Controller>
   | HonoDefaultHandler;
+

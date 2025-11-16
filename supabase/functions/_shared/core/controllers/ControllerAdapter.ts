@@ -1,6 +1,6 @@
-import { ControllerCtor } from "../../types/controllers.types.ts";
-import { HonoFactory } from "../../types/hono.types.ts";
-import { RouterHandler } from "../../types/routes.types.ts";
+import { ControllerCtor } from "../types/controllers.types.ts";
+import { HonoFactory } from "../types/hono.types.ts";
+import { RouterHandler } from "../types/routes.types.ts";
 
 class ControllerAdapter {
   constructor(public honoFactory: HonoFactory) {}

@@ -5,7 +5,7 @@ import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts"
 import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
 import { Hono } from "hono";
 import { createFactory } from "hono/factory";
-import { HonoFactory } from "../../types/hono.types.ts";
+import { HonoFactory } from "../types/hono.types.ts";
 import RouterAdapter from "../router/RouterAdapter.ts";
 
 class App {

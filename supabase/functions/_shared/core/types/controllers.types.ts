@@ -1,4 +1,4 @@
-import Controller from "../core/controllers/contracts/Controller.ts";
+import Controller from "../controllers/contracts/Controller.ts";
 
 export type ControllerClassType = new () => Controller;
 export type PublicMethodNames<T> = {
@@ -9,3 +9,4 @@ export type PublicMethodNames<T> = {
 export type ControllerCtor<T extends Controller = Controller> = new (
   ...args: any[]
 ) => T;
+

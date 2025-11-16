@@ -1,4 +1,4 @@
-import { MiddlewareClassType } from "../../types/middlewares.types.ts";
+import { MiddlewareClassType } from "../types/middlewares.types.ts";
 import Middleware from "./contracts/Middleware.ts";
 
 class MiddlewareRegistry {

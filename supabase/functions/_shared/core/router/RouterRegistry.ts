@@ -1,8 +1,8 @@
 import { MiddlewareName } from "@/shared/bootstrap.ts";
 import Route from "@/shared/core/router/Route.ts";
 import RouteMethods from "@/shared/core/router/enums/RouteMethods.ts";
-import { ControllerCtor } from "../../types/controllers.types.ts";
-import { RouterHandler } from "../../types/routes.types.ts";
+import { ControllerCtor } from "../types/controllers.types.ts";
+import { RouterHandler } from "../types/routes.types.ts";
 
 class RouterRegistry {
   private routes: Route<ControllerCtor>[] = [];

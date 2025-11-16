@@ -1,5 +1,5 @@
 import type Middleware from "@/shared/core/middlewares/contracts/Middleware.ts";
-import { HonoFactory } from "../../types/hono.types.ts";
+import { HonoFactory } from "../types/hono.types.ts";
 
 /**
  * Adapter to convert our Middleware interface to Hono middleware.
