@@ -5,5 +5,11 @@
   "stored_successfully": "Erfolgreich gespeichert",
   "update_successfully": "Erfolgreich aktualisiert",
   "delete_successfully": "Erfolgreich gelöscht",
-  "there_is_no_data": "Keine Daten vorhanden"
+  "there_is_no_data": "Keine Daten vorhanden",
+  "error_validation": "Validierungsfehler",
+  "error_unauthorized": "Nicht autorisiert",
+  "error_forbidden": "Verboten",
+  "error_not_found": "Nicht gefunden",
+  "error_internal_server": "Interner Serverfehler",
+  "error_unknown": "Ein unbekannter Fehler ist aufgetreten"
 }

@@ -8,6 +8,7 @@ import { createFactory } from "hono/factory";
 import Locale from "../../modules/localization/Locale.ts";
 import RouterAdapter from "../router/RouterAdapter.ts";
 import { HonoFactory } from "../types/hono.types.ts";
+import { ErrorHandler } from "../errors/ErrorHandler.ts";
 
 class App {
   private static instance: App | null = null;
@@ -34,19 +35,23 @@ class App {
     );
 
     this._locale = new Locale();
-
-    this.initializeMiddlewareRegistry();
   }
 
   public static make(): App {
     if (!this.instance) {
       this.instance = new App();
+      this.instance.register();
     }
     return this.instance;
   }
 
   public static destroy(): void {
     this.instance = null;
+  }
+
+  private register(): void {
+    this.initializeMiddlewareRegistry();
+    this.setupErrorHandler();
   }
 
   private initializeMiddlewareRegistry(): void {
@@ -64,7 +69,14 @@ class App {
     }
   }
 
-  private registerRoutes(): void {
+  private setupErrorHandler(): void {
+    const errorHandler = new ErrorHandler();
+    this.honoApp.onError((error, context) => {
+      return errorHandler.handle(error, context);
+    });
+  }
+
+  private boot(): void {
     const routes = this.routeRegistry.getRoutes();
     this.routerAdapter.registerRoutes(routes);
   }
@@ -77,12 +89,8 @@ class App {
     return this._locale;
   }
 
-  private wrapItUpp() {
-    this.registerRoutes();
-  }
-
   fetch() {
-    this.wrapItUpp();
+    this.boot();
     return this.honoApp.fetch;
   }
 }

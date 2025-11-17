@@ -5,6 +5,7 @@ export class ApiResponse<T = unknown> {
   public _code: number;
   public _message: string;
   public _data: T | null;
+  private _error: Record<string, unknown> | string | null = null;
   private readonly _headers: Headers;
 
   constructor() {
@@ -75,6 +76,16 @@ export class ApiResponse<T = unknown> {
     return this;
   }
 
+  code(statusCode: number): this {
+    this._code = statusCode;
+    return this;
+  }
+
+  error(errorInfo: Record<string, unknown> | string): this {
+    this._error = errorInfo;
+    return this;
+  }
+
   noData(value: T | null = null): this {
     this._data = value;
     this._message = trans("there_is_no_data");
@@ -115,11 +126,22 @@ export class ApiResponse<T = unknown> {
   }
 
   toJson(): string {
-    return JSON.stringify({
+    const response: {
+      data: T | null;
+      message: string;
+      code: number;
+      error?: Record<string, unknown> | string;
+    } = {
       data: this._data,
       message: this._message,
       code: this._code,
-    });
+    };
+
+    if (this._error) {
+      response.error = this._error;
+    }
+
+    return JSON.stringify(response);
   }
 
   send(): Response {
