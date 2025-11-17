@@ -5,18 +5,20 @@ import MiddlewareRegistry from "@/shared/core/middlewares/MiddlewareRegistry.ts"
 import RouterRegistry from "@/shared/core/router/RouterRegistry.ts";
 import { Hono } from "hono";
 import { createFactory } from "hono/factory";
+import Locale from "../../modules/localization/Locale.ts";
 import RouterAdapter from "../router/RouterAdapter.ts";
 import { HonoFactory } from "../types/hono.types.ts";
 
 class App {
+  private static instance: App | null = null;
   public readonly honoApp: Hono;
   private middlewareRegistry: MiddlewareRegistry;
   private routeRegistry: RouterRegistry;
   private honoFactory: HonoFactory;
-  private static instance: App | null = null;
   private middlewareAdapter: MiddlewareAdapter;
   private controllerAdapter: ControllerAdapter;
   private routerAdapter: RouterAdapter;
+  private _locale: Locale;
 
   private constructor() {
     this.honoFactory = createFactory();
@@ -30,6 +32,8 @@ class App {
       this.middlewareAdapter,
       this.controllerAdapter,
     );
+
+    this._locale = new Locale();
 
     this.initializeMiddlewareRegistry();
   }
@@ -67,6 +71,10 @@ class App {
 
   public get router() {
     return this.routeRegistry;
+  }
+
+  public get locale() {
+    return this._locale;
   }
 
   private wrapItUpp() {

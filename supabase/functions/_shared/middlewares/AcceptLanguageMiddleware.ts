@@ -1,7 +1,7 @@
 import { APP_LOCALES, DEFAULT_LOCALE } from "@/shared/bootstrap.ts";
 import type Middleware from "@/shared/core/middlewares/contracts/Middleware.ts";
-import Locale from "@/shared/modules/localization/Locale.ts";
 import type { Context, Next } from "hono";
+import App from "../core/bootstrap/App.ts";
 
 class AcceptLanguageMiddleware implements Middleware {
   async handle(c: Context, next: Next): Promise<Response | void> {
@@ -9,7 +9,7 @@ class AcceptLanguageMiddleware implements Middleware {
 
     const locale = this.parseAcceptLanguage(acceptLanguage ?? DEFAULT_LOCALE);
 
-    Locale.make().setLocale(locale);
+    App.make().locale.setLocale(locale);
 
     c.set("locale", locale);
 

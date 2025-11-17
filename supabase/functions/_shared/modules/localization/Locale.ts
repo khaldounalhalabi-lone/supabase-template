@@ -1,6 +1,8 @@
+import de from "@/shared/modules/localization/messages/de.json" with { type: "json" };
+import en from "@/shared/modules/localization/messages/en.json" with { type: "json" };
 import i18next from "i18n";
-import en from "@/shared/modules/localization/messages/en.json" assert { type: "json" };
-import de from "@/shared/modules/localization/messages/de.json" assert { type: "json" };
+import { DEFAULT_LOCALE } from "../../bootstrap.ts";
+
 type TranslationSchema = typeof en;
 
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
@@ -14,10 +16,10 @@ type DeepKeys<T> = T extends object
 export type LocaleMessageKey = DeepKeys<TranslationSchema>;
 
 class Locale {
-  private static instance: Locale;
-  private static currentLocale: string;
+  private currentLocale: string;
 
-  private constructor() {
+  constructor() {
+    this.currentLocale = DEFAULT_LOCALE;
     i18next.init({
       fallbackLng: "en",
       resources: {
@@ -31,19 +33,12 @@ class Locale {
     });
   }
 
-  public static make() {
-    if (!Locale.instance) {
-      Locale.instance = new Locale();
-    }
-    return Locale.instance;
-  }
-
   public setLocale(locale: string) {
-    Locale.currentLocale = locale;
+    this.currentLocale = locale;
   }
 
   public getLocale(): string {
-    return Locale.currentLocale;
+    return this.currentLocale;
   }
 
   public translate(key: LocaleMessageKey, locale?: string) {
