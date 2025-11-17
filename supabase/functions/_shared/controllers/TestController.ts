@@ -2,16 +2,12 @@ import { Context } from "hono";
 import Controller from "../core/controllers/contracts/Controller.ts";
 import { trans } from "../modules/localization/Helpers.ts";
 import { ApiResponse } from "../modules/response/ApiResponse.ts";
+import { supabaseAdmin } from "../modules/supabase/client.ts";
 
 class TestController extends Controller {
-  public index(c: Context): Response {
-    return ApiResponse.create()
-      .data({
-        message: "Hello World",
-      })
-      .ok()
-      .getSuccess()
-      .send();
+  public async index(c: Context): Promise<Response> {
+    const { data } = await supabaseAdmin.from("products").select("*");
+    return ApiResponse.create().data(data).ok().getSuccess().send();
   }
 
   public show(c: Context): Response {
