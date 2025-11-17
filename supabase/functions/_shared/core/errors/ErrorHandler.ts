@@ -15,18 +15,16 @@ export class ErrorHandler {
       console.error("Server error:", error);
     }
 
-    const response = rest()
+    return rest()
       .data(null)
       .message(message)
-      .code(this.normalizeStatusCode(statusCode));
-
-    if (isDevelopment()) {
-      response.error(this.getDebugInfo(error));
-    } else {
-      response.error("UNKNOWN ERROR");
-    }
-
-    return response.send();
+      .code(this.normalizeStatusCode(statusCode))
+      .when(
+        isDevelopment(),
+        (res) => res.error(this.getDebugInfo(error)),
+        (res) => res.error("UNKNOWN ERROR"),
+      )
+      .send();
   }
 
   private getDebugInfo(error: Error): Record<string, unknown> {
